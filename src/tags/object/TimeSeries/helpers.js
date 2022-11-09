@@ -40,9 +40,32 @@ export const clearD3Event = f => setTimeout(f, 0);
 
 // check if we are in recursive event loop, caused by `event`
 export const checkD3EventLoop = event => {
-  if (!d3.event.sourceEvent) return true;
-  if (event) return d3.event.sourceEvent.type === event;
-  return ["start", "brush", "end"].includes(d3.event.sourceEvent.type);
+  if (!/* TODO: JSFIX could not patch the breaking change:
+  Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+  Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+  If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+  Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+  So an event listener on a drag object could look something like:
+      drag().on("start", (event, d) => lastEvent = event; … ) */
+  d3.event.sourceEvent) return true;
+  if (event) return (
+    /* TODO: JSFIX could not patch the breaking change:
+    Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+    Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+    If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+    Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+    So an event listener on a drag object could look something like:
+        drag().on("start", (event, d) => lastEvent = event; … ) */
+    d3.event.sourceEvent.type === event
+  );
+  return ["start", "brush", "end"].includes(/* TODO: JSFIX could not patch the breaking change:
+  Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+  Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+  If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+  Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+  So an event listener on a drag object could look something like:
+      drag().on("start", (event, d) => lastEvent = event; … ) */
+  d3.event.sourceEvent.type);
 };
 
 const formatDateDiff = (start, end) => {

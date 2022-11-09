@@ -155,7 +155,14 @@ class ChannelD3 extends React.Component {
   };
 
   createBrushMovedHandler = id => () => {
-    if (checkD3EventLoop("end") || !d3.event.selection) return;
+    if (checkD3EventLoop("end") || !/* TODO: JSFIX could not patch the breaking change:
+    Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+    Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+    If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+    Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+    So an event listener on a drag object could look something like:
+        drag().on("start", (event, d) => lastEvent = event; … ) */
+    d3.event.selection) return;
     const { ranges } = this.props;
     const { parent } = this.props.item;
     const i = ranges.findIndex(range => range.id === id);
@@ -165,13 +172,27 @@ class ChannelD3 extends React.Component {
       return;
     }
     const r = ranges[i];
-    const moved = this.getRegion(d3.event.selection, r.instant);
+    const moved = this.getRegion(/* TODO: JSFIX could not patch the breaking change:
+    Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+    Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+    If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+    Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+    So an event listener on a drag object could look something like:
+        drag().on("start", (event, d) => lastEvent = event; … ) */
+    d3.event.selection, r.instant);
     // click simulation - if selection didn't move
     const isJustClick = moved.start === r.start && moved.end === r.end;
 
     if (isJustClick) {
       parent?.annotation.unselectAreas();
-      r.onClickRegion(d3.event.sourceEvent);
+      r.onClickRegion(/* TODO: JSFIX could not patch the breaking change:
+      Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+      Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+      If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+      Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+      So an event listener on a drag object could look something like:
+          drag().on("start", (event, d) => lastEvent = event; … ) */
+      d3.event.sourceEvent);
     } else {
       parent?.regionChanged(moved, i);
     }
@@ -191,8 +212,28 @@ class ChannelD3 extends React.Component {
 
     if (checkD3EventLoop("end")) return;
     // just a click - create insant region or select region
-    if (!d3.event.selection) {
-      const x = d3.mouse(d3.event.sourceEvent.target)[0];
+    if (!/* TODO: JSFIX could not patch the breaking change:
+    Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+    Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+    If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+    Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+    So an event listener on a drag object could look something like:
+        drag().on("start", (event, d) => lastEvent = event; … ) */
+    d3.event.selection) {
+      const x = /* TODO: JSFIX could not patch the breaking change:
+      d3.mouse, d3.touch, d3.touches and d3.clientPoint has been removed. use d3.pointer(s) instead. 
+      Suggested fix: The new d3.pointer(event) method replaces the d3.mouse method.
+      To fix this change simply rename the method call, and then parse the `event` to the method instead of the current arguments.
+      This also means that if you are not already doing it, you need to parse the `event` as the first argument to the event listener. 
+      For an example see the official migration guide here: https://observablehq.com/@d3/d3v6-migration-guide#pointer. */
+      d3.mouse(/* TODO: JSFIX could not patch the breaking change:
+      Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+      Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+      If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+      Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+      So an event listener on a drag object could look something like:
+          drag().on("start", (event, d) => lastEvent = event; … ) */
+      d3.event.sourceEvent.target)[0];
       const newRegion = this.newRegion;
 
       // when 2nd click happens during 300ms after 1st click and in the same place
@@ -223,16 +264,44 @@ class ChannelD3 extends React.Component {
       const region = regions[nextIndex];
 
       if (region) {
-        region.onClickRegion(d3.event.sourceEvent);
+        region.onClickRegion(/* TODO: JSFIX could not patch the breaking change:
+        Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+        Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+        If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+        Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+        So an event listener on a drag object could look something like:
+            drag().on("start", (event, d) => lastEvent = event; … ) */
+        d3.event.sourceEvent);
       } else {
         parent?.annotation.unselectAreas();
       }
       return;
     }
-    const region = this.getRegion(d3.event.selection);
+    const region = this.getRegion(/* TODO: JSFIX could not patch the breaking change:
+    Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+    Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+    If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+    Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+    So an event listener on a drag object could look something like:
+        drag().on("start", (event, d) => lastEvent = event; … ) */
+    d3.event.selection);
 
     this.brushCreator.move(this.gCreator, null);
-    const additionalSelection = d3.event.sourceEvent.ctrlKey || d3.event.sourceEvent.metaKey;
+    const additionalSelection = /* TODO: JSFIX could not patch the breaking change:
+    Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+    Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+    If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+    Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+    So an event listener on a drag object could look something like:
+        drag().on("start", (event, d) => lastEvent = event; … ) */
+    d3.event.sourceEvent.ctrlKey || /* TODO: JSFIX could not patch the breaking change:
+    Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+    Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+    If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+    Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+    So an event listener on a drag object could look something like:
+        drag().on("start", (event, d) => lastEvent = event; … ) */
+    d3.event.sourceEvent.metaKey;
 
     if (additionalSelection || !statesSelected) {
       const regions = ranges.filter(r => r.start >= region.start && r.end <= region.end);
@@ -277,13 +346,48 @@ class ChannelD3 extends React.Component {
         const group = d3.select(this);
         const brush = d3.brushX().extent(extent);
 
+        /* TODO: JSFIX could not patch the breaking change:
+        Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+        Suggested fix: 
+        This is only breaking if the second argument to .on() is being parsed the “index” (i) and “elements” (e) as arguments. 
+        The signature of the listeners have been changed to now only take the event object and the “datum” (d) (which it already did).
+        To get the existing “index” and “elements” functionality you can inside the listener use
+            const selection = event.selection;
+            const e = selection.nodes();
+            const i = e.indexOf(this);
+        For further details see the official migration guide here: https://observablehq.com/@d3/d3v6-migration-guide#events. 
+         */
         brush.on("brush", function() {
           if (checkD3EventLoop("brush")) return;
-          const sticked = getRegion(d3.event.selection, r.instant);
+          const sticked = getRegion(/* TODO: JSFIX could not patch the breaking change:
+          Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+          Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+          If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+          Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+          So an event listener on a drag object could look something like:
+              drag().on("start", (event, d) => lastEvent = event; … ) */
+          d3.event.selection, r.instant);
 
           managerBrush.move(group, [x(sticked.start), x(sticked.end) + r.instant * 0.5]);
-          updateTracker(d3.mouse(this)[0]);
+          updateTracker(/* TODO: JSFIX could not patch the breaking change:
+          d3.mouse, d3.touch, d3.touches and d3.clientPoint has been removed. use d3.pointer(s) instead. 
+          Suggested fix: The new d3.pointer(event) method replaces the d3.mouse method.
+          To fix this change simply rename the method call, and then parse the `event` to the method instead of the current arguments.
+          This also means that if you are not already doing it, you need to parse the `event` as the first argument to the event listener. 
+          For an example see the official migration guide here: https://observablehq.com/@d3/d3v6-migration-guide#pointer. */
+          d3.mouse(this)[0]);
         });
+        /* TODO: JSFIX could not patch the breaking change:
+        Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+        Suggested fix: 
+        This is only breaking if the second argument to .on() is being parsed the “index” (i) and “elements” (e) as arguments. 
+        The signature of the listeners have been changed to now only take the event object and the “datum” (d) (which it already did).
+        To get the existing “index” and “elements” functionality you can inside the listener use
+            const selection = event.selection;
+            const e = selection.nodes();
+            const i = e.indexOf(this);
+        For further details see the official migration guide here: https://observablehq.com/@d3/d3v6-migration-guide#events. 
+         */
         brush.on("end", createHandler(r.id));
         brush(group);
 
@@ -347,23 +451,72 @@ class ChannelD3 extends React.Component {
     const block = this.gCreator;
     const getRegion = this.getRegion;
     const x = this.x;
-    const brush = (this.brushCreator = d3
+    const brush = (this.brushCreator = // replacing default filter to allow ctrl-click action
+    /* TODO: JSFIX could not patch the breaking change:
+    Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+    Suggested fix: 
+    This is only breaking if the second argument to .on() is being parsed the “index” (i) and “elements” (e) as arguments. 
+    The signature of the listeners have been changed to now only take the event object and the “datum” (d) (which it already did).
+    To get the existing “index” and “elements” functionality you can inside the listener use
+        const selection = event.selection;
+        const e = selection.nodes();
+        const i = e.indexOf(this);
+    For further details see the official migration guide here: https://observablehq.com/@d3/d3v6-migration-guide#events. 
+     */
+    /* TODO: JSFIX could not patch the breaking change:
+    Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+    Suggested fix: 
+    This is only breaking if the second argument to .on() is being parsed the “index” (i) and “elements” (e) as arguments. 
+    The signature of the listeners have been changed to now only take the event object and the “datum” (d) (which it already did).
+    To get the existing “index” and “elements” functionality you can inside the listener use
+        const selection = event.selection;
+        const e = selection.nodes();
+        const i = e.indexOf(this);
+    For further details see the official migration guide here: https://observablehq.com/@d3/d3v6-migration-guide#events. 
+     */
+    d3
       .brushX()
       .extent([
         [0, 0],
         [this.state.width, this.height],
       ])
       .on("brush", function() {
-        if (checkD3EventLoop("brush") || !d3.event.selection) return;
-        const sticked = getRegion(d3.event.selection);
+        if (checkD3EventLoop("brush") || !/* TODO: JSFIX could not patch the breaking change:
+        Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+        Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+        If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+        Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+        So an event listener on a drag object could look something like:
+            drag().on("start", (event, d) => lastEvent = event; … ) */
+        d3.event.selection) return;
+        const sticked = getRegion(/* TODO: JSFIX could not patch the breaking change:
+        Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+        Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+        If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+        Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+        So an event listener on a drag object could look something like:
+            drag().on("start", (event, d) => lastEvent = event; … ) */
+        d3.event.selection);
 
         brush.move(block, [x(sticked.start), x(sticked.end)]);
-        updateTracker(d3.mouse(this)[0], sticked.end - sticked.start);
+        updateTracker(/* TODO: JSFIX could not patch the breaking change:
+        d3.mouse, d3.touch, d3.touches and d3.clientPoint has been removed. use d3.pointer(s) instead. 
+        Suggested fix: The new d3.pointer(event) method replaces the d3.mouse method.
+        To fix this change simply rename the method call, and then parse the `event` to the method instead of the current arguments.
+        This also means that if you are not already doing it, you need to parse the `event` as the first argument to the event listener. 
+        For an example see the official migration guide here: https://observablehq.com/@d3/d3v6-migration-guide#pointer. */
+        d3.mouse(this)[0], sticked.end - sticked.start);
       })
       .on("end", this.newBrushHandler)
-      // replacing default filter to allow ctrl-click action
       .filter(()=>{
-        return !d3.event.button;
+        return !/* TODO: JSFIX could not patch the breaking change:
+        Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+        Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+        If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+        Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+        So an event listener on a drag object could look something like:
+            drag().on("start", (event, d) => lastEvent = event; … ) */
+        d3.event.button;
       })
     );
 
@@ -410,9 +563,26 @@ class ChannelD3 extends React.Component {
       .attr("stroke", "#666");
 
     function onHover() {
-      updateTracker(d3.mouse(this)[0]);
+      updateTracker(/* TODO: JSFIX could not patch the breaking change:
+      d3.mouse, d3.touch, d3.touches and d3.clientPoint has been removed. use d3.pointer(s) instead. 
+      Suggested fix: The new d3.pointer(event) method replaces the d3.mouse method.
+      To fix this change simply rename the method call, and then parse the `event` to the method instead of the current arguments.
+      This also means that if you are not already doing it, you need to parse the `event` as the first argument to the event listener. 
+      For an example see the official migration guide here: https://observablehq.com/@d3/d3v6-migration-guide#pointer. */
+      d3.mouse(this)[0]);
     }
 
+    /* TODO: JSFIX could not patch the breaking change:
+    Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+    Suggested fix: 
+    This is only breaking if the second argument to .on() is being parsed the “index” (i) and “elements” (e) as arguments. 
+    The signature of the listeners have been changed to now only take the event object and the “datum” (d) (which it already did).
+    To get the existing “index” and “elements” functionality you can inside the listener use
+        const selection = event.selection;
+        const e = selection.nodes();
+        const i = e.indexOf(this);
+    For further details see the official migration guide here: https://observablehq.com/@d3/d3v6-migration-guide#events. 
+     */
     this.main.on("mousemove", onHover);
   };
 
@@ -493,14 +663,34 @@ class ChannelD3 extends React.Component {
     const times = data[time];
     const upd = item.parent?.throttledRangeUpdate();
     const onZoom = () => {
-      const e = d3.event;
+      const e = /* TODO: JSFIX could not patch the breaking change:
+      Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+      Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+      If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+      Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+      So an event listener on a drag object could look something like:
+          drag().on("start", (event, d) => lastEvent = event; … ) */
+      d3.event;
 
       if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
       const { range } = this.props;
       const indices = range.map(r => d3.bisectRight(times, r));
       const MAX_POINTS_ON_SCREEN = 10;
-      const [x] = d3.mouse(d3.event.target);
+      const [x] = /* TODO: JSFIX could not patch the breaking change:
+      d3.mouse, d3.touch, d3.touches and d3.clientPoint has been removed. use d3.pointer(s) instead. 
+      Suggested fix: The new d3.pointer(event) method replaces the d3.mouse method.
+      To fix this change simply rename the method call, and then parse the `event` to the method instead of the current arguments.
+      This also means that if you are not already doing it, you need to parse the `event` as the first argument to the event listener. 
+      For an example see the official migration guide here: https://observablehq.com/@d3/d3v6-migration-guide#pointer. */
+      d3.mouse(/* TODO: JSFIX could not patch the breaking change:
+      Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+      Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+      If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+      Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+      So an event listener on a drag object could look something like:
+          drag().on("start", (event, d) => lastEvent = event; … ) */
+      d3.event.target);
       const width = this.x.range()[1];
       // slow down zooming in
       const scale = Math.min(0.3, -e.deltaY / this.height);
@@ -517,6 +707,17 @@ class ChannelD3 extends React.Component {
       upd(zoomed, scale);
     };
 
+    /* TODO: JSFIX could not patch the breaking change:
+    Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+    Suggested fix: 
+    This is only breaking if the second argument to .on() is being parsed the “index” (i) and “elements” (e) as arguments. 
+    The signature of the listeners have been changed to now only take the event object and the “datum” (d) (which it already did).
+    To get the existing “index” and “elements” functionality you can inside the listener use
+        const selection = event.selection;
+        const e = selection.nodes();
+        const i = e.indexOf(this);
+    For further details see the official migration guide here: https://observablehq.com/@d3/d3v6-migration-guide#events. 
+     */
     this.main.on("wheel", onZoom);
   }
 
