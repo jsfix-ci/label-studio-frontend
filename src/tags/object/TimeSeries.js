@@ -618,8 +618,22 @@ const Overview = observer(({ item, data, series }) => {
   const MIN_OVERVIEW = 10;
 
   function brushed() {
-    if (d3.event.selection && !checkD3EventLoop("brush") && !checkD3EventLoop("wheel")) {
-      let [x1, x2] = d3.event.selection;
+    if (/* TODO: JSFIX could not patch the breaking change:
+    Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+    Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+    If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+    Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+    So an event listener on a drag object could look something like:
+        drag().on("start", (event, d) => lastEvent = event; … ) */
+    d3.event.selection && !checkD3EventLoop("brush") && !checkD3EventLoop("wheel")) {
+      let [x1, x2] = /* TODO: JSFIX could not patch the breaking change:
+      Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+      Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+      If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+      Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+      So an event listener on a drag object could look something like:
+          drag().on("start", (event, d) => lastEvent = event; … ) */
+      d3.event.selection;
       const prev = prevBrush.current;
       const overviewWidth = x2 - x1;
       let start = +x.invert(x1);
@@ -652,9 +666,22 @@ const Overview = observer(({ item, data, series }) => {
   }
 
   function brushended() {
-    if (!d3.event.selection) {
+    if (!/* TODO: JSFIX could not patch the breaking change:
+    Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+    Suggested fix: If this reading of the d3.event property is inside an event listener, you can change `d3.event` to just be `event` and then parse the event object as the new first argument to the event listener. See the example: https://observablehq.com/@d3/d3v6-migration-guide#cell-427. 
+    If you are reading d3.event outside of an event listener, there is no “good/clean” alternative.
+    Our suggestion is to have your own variable containing the last event, which is then set inside the different event listener, from which you are trying to get the event using d3.event.
+    So an event listener on a drag object could look something like:
+        drag().on("start", (event, d) => lastEvent = event; … ) */
+    d3.event.selection) {
       // move selection on click; try to preserve it's width
-      const center = d3.mouse(this)[0];
+      const center = /* TODO: JSFIX could not patch the breaking change:
+      d3.mouse, d3.touch, d3.touches and d3.clientPoint has been removed. use d3.pointer(s) instead. 
+      Suggested fix: The new d3.pointer(event) method replaces the d3.mouse method.
+      To fix this change simply rename the method call, and then parse the `event` to the method instead of the current arguments.
+      This also means that if you are not already doing it, you need to parse the `event` as the first argument to the event listener. 
+      For an example see the official migration guide here: https://observablehq.com/@d3/d3v6-migration-guide#pointer. */
+      d3.mouse(this)[0];
       const range = item.brushRange.map(x);
       const half = (range[1] - range[0]) >> 1;
       let moved = [center - half, center + half];
@@ -665,7 +692,29 @@ const Overview = observer(({ item, data, series }) => {
     }
   }
 
-  const brush = d3
+  const brush = /* TODO: JSFIX could not patch the breaking change:
+  Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+  Suggested fix: 
+  This is only breaking if the second argument to .on() is being parsed the “index” (i) and “elements” (e) as arguments. 
+  The signature of the listeners have been changed to now only take the event object and the “datum” (d) (which it already did).
+  To get the existing “index” and “elements” functionality you can inside the listener use
+      const selection = event.selection;
+      const e = selection.nodes();
+      const i = e.indexOf(this);
+  For further details see the official migration guide here: https://observablehq.com/@d3/d3v6-migration-guide#events. 
+   */
+  /* TODO: JSFIX could not patch the breaking change:
+  Remove d3.event and changed the interface for the listeners parsed to .on() methods 
+  Suggested fix: 
+  This is only breaking if the second argument to .on() is being parsed the “index” (i) and “elements” (e) as arguments. 
+  The signature of the listeners have been changed to now only take the event object and the “datum” (d) (which it already did).
+  To get the existing “index” and “elements” functionality you can inside the listener use
+      const selection = event.selection;
+      const e = selection.nodes();
+      const i = e.indexOf(this);
+  For further details see the official migration guide here: https://observablehq.com/@d3/d3v6-migration-guide#events. 
+   */
+  d3
     .brushX()
     .extent([
       [0, 0],
